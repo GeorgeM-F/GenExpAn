@@ -2,9 +2,9 @@ import pandas as PS
 
 # === MAKE PANDAS TABLE BASED ON TABULATION === #
 try:   # if there are no separators:
-    matrix = PS.read_csv("GSE330228_Mtb_H37Rv_mutants_raw_counts.csv", sep=None, engine="python", index_col=0)
+    matrix = PS.read_csv("m.csv", sep=None, engine="python", index_col=0)
 except Exception as e:   # if there are multiple spaces as separators:
-    matrix = PS.read_csv("GSE330228_Mtb_H37Rv_mutants_raw_counts.csv", sep=r"\s+", index_col=0)
+    matrix = PS.read_csv("m.csv", sep=r"\s+", index_col=0)
 
 # === IF NEEDED, TRANSPOSE MATRIX === #
 # makes a new table "matrixi" based on the original "matrix"
