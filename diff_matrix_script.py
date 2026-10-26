@@ -21,19 +21,34 @@ dataset = DeseqDataSet(
 )
 print("note: deseq dataset has been created")
 
-# === ACTUAL ANALYSIS === #
+# === STATISTICS ANALYSIS === #
 print("estimation of normalization & dispersion factors: STARTED...")
 dataset.deseq2()   # Estimates normalization & dispersion factors
 print("estimation of normalization & dispersion factors: FINISHED!")
 
 print("differential expression statistics calculation: STARTED...")
 stats = DeseqStats(dataset, contrast=["condition", "treated", "control"])   # Produces statistics by comparing the data with "condition"="treated" to those with "condition"="control"
+stats.summary()
 print("differential expression statistics calculation: FINISHED!")
 
-# === MAKE SUMMARY === #
-stats.summary()   # Makes a summary of produced stats
+# === OBTAIN DATA FOR HEATMAP === #
+print("variance stabilizing transformation: STARTED...")
+dataset.vst()   # Runs "Variance Stabilizing Transformation" on dataset.
+vstprematrix = PS.DataFrame(   # Makes new table with the resulting data.
+    dataset.layers["vst_counts"], index=dataset.obs_names, columns=dataset.var_names   # dataset.layers["vst_counts"] = Normalized expression values per sample.
+)
+vstmatrix = vstprematrix.T   # Returns to standard layout
+print("variance stabilizing transformation: FINISHED!")
 
-# === SAVE EVERYTHING TO FILE === #
-stats.results_df.to_csv("results.csv")   # Saves stats' results dataframe to file
-print("SUCCESS! Results have been saved in 'results.csv'.")
+# === SELECT MOST SIGNIFICANT GENES (NOT USED YET...) === #
+print("selecting top 50 results: STARTED...")
+statres = stats.results_df
+sortstatres = statres.dropna(subset=["padj"]).sort_values("padj")   # Orders statres by padj values.
+top50 = sortstatres.head(50).index.tolist()   # Selects the top 50 values.
+topmatrix = vstmatrix.loc[top50]   # Subset (top 50) of the vstmatrix.
+print("selecting top 50 results: FINISHED!")
 
+# === CENTERING AND SAVING DATA === #
+diffmatrix = vstmatrix.sub(vstmatrix.mean(axis=1), axis=0)   # Centers data around 0
+diffmatrix.to_csv("differential_expression_values.csv")
+print("SUCCESS! Results have been saved in 'differential_expression_values.csv'.")
