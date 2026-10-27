@@ -40,7 +40,7 @@ vstprematrix = PS.DataFrame(   # Makes new table with the resulting data.
 vstmatrix = vstprematrix.T   # Returns to standard layout
 print("variance stabilizing transformation: FINISHED!")
 
-# === SELECT MOST SIGNIFICANT GENES (NOT USED YET...) === #
+# === SELECT 50 MOST SIGNIFICANT GENES === #
 print("selecting top 50 results: STARTED...")
 statres = stats.results_df
 sortstatres = statres.dropna(subset=["padj"]).sort_values("padj")   # Orders statres by padj values.
@@ -49,6 +49,6 @@ topmatrix = vstmatrix.loc[top50]   # Subset (top 50) of the vstmatrix.
 print("selecting top 50 results: FINISHED!")
 
 # === CENTERING AND SAVING DATA === #
-diffmatrix = vstmatrix.sub(vstmatrix.mean(axis=1), axis=0)   # Centers data around 0
+diffmatrix = topmatrix.sub(topmatrix.mean(axis=1), axis=0)   # Centers data around 0
 diffmatrix.to_csv("differential_expression_values.csv")
 print("SUCCESS! Results have been saved in 'differential_expression_values.csv'.")
